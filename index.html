@@ -1,6 +1,57 @@
 <!doctype html>
 <html lang="en">
 	<head>
+		<!-- (Place immediately after <head> Global site tag (gtag.js) - Google Analytics -- would like this to be built into sitecore interface -- to enter account number-->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-1836455-16"></script>
+		<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+	
+  // Enable enhanced link attribution with every option customized
+  gtag('config', 'UA-1836455-16', {
+  'link_attribution': {
+    'cookie_name': '_hwali',
+    'cookie_expires': 45,
+    'levels': 4
+  }
+  });
+</script>
+
+<!-- Functions used for event tracking in analytics - gtag-->
+<script>
+/**
+* Function automatically tracks a click on an outbound link. Setting the transport method to 'beacon' * lets the hit be sent using 'navigator.sendBeacon' in browser that support it.
+*/
+var trackOutboundLink = function(url) {
+	gtag('event', 'click', {
+    'event_category': 'Outbound link',
+    'event_label': url,
+    'transport_type': 'beacon',
+    'event_callback': function(){document.location = url;}
+  });
+}
+
+//Function tracks keyboard clicks
+var trackKeyboardClicks = function(url) {
+	gtag('event', 'click', {
+    'event_category': 'Keyboard click',
+    'event_label': url,
+    'transport_type': 'beacon',
+    'event_callback': function(){document.location = url}
+  });
+}
+
+//Function tracks keyboard tabs
+var trackKeyboardTabbing = function(url) {
+	gtag('event', 'tab', {
+	'send_to': 'UA-1836455-16',
+    'event_category': 'Keyboard tab',
+    'event_label': window.location.href
+  });
+}
+</script>
+		
 <!-- Include on every page -->
 	<!-- required = if empty, do not allow to publish --> 
     <meta charset="utf-8">
@@ -513,5 +564,58 @@
 <!-- MDB core JavaScript -->
 		<script type="text/javascript" src="js/mdb.min.js">
 		</script>
-	</body>
+<!--Analytics event tracking-->
+<script>			  
+jQuery(document).ready(function($){
+
+	//outbound links
+	$('a[href^="http"]:not([href*="//' + location.host + '"])').on('click', function(e) {
+		trackOutboundLink($(this).attr("href")); return true;
+	});
+	
+	//keyboard enter a link
+	$('a[href^="http"]').on('keydown', function(e) {
+		if (e.which == '13') {
+			trackKeyboardClicks($(this).attr("href")); return true;
+		}
+	});
+
+	//keyboard tab past a link
+	$('a[href^="http"]').on('keydown', function(e) {
+		if (e.which == '9') {
+			trackKeyboardTabbing($(this).attr("href")); return true;
+		}
+	});
+	
+	// mailto function
+	$('a[href^="mailto:"]').click(function(){
+		var emaillink=jQuery(this).attr('href');
+		gtag('event', 'contact', { 'event_category' : 'Email', 'event_action' : 'Mailto Click', 'event_label' : emaillink});
+		return true;
+ 		});
+ 
+	// tel: function
+	$('a[href^="tel:"]').click(function(){
+		var telephonenumber=jQuery(this).attr('href');
+		gtag('event', 'contact', { 'event_category' : 'Phone call', 'event_action' : 'Tel Link Click', 'event_label' : telephonenumber});
+		return true;
+		});
+ 
+	// pdf function
+	$('a[href$=".pdf"]').click(function(){
+		var pdfurl=jQuery(this).attr('href');
+	 	gtag('event', 'contact', { 'event_category' : 'PDF download', 'event_action' : 'Download', 'event_label' : pdfurl});
+	 	return true;
+	 	});
+
+		// general download, for use in Sitecore
+	$('a[href$=".ashx"]').click(function(){
+		var downloadurl=jQuery(this).attr('href');
+	 	gtag('event', 'contact', { 'event_category' : 'Download', 'event_action' : 'Download', 'event_label' : downloadurl});
+	 	return true;
+	 	});
+	
+});
+</script>
+		</body>
 </html>
